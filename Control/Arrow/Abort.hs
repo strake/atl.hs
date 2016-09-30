@@ -19,8 +19,9 @@ import Control.Exception
 
 newtype AbortT v a b c = AbortT { unwrapAbortT :: a b (Either v c) }
 
-runAbortT :: Arrow a => AbortT v a b v -> a b v;
-runAbortT = (>>> arr (either id id)) . unwrapAbortT;
+runAbortT :: Arrow a => AbortT v a b v -> a b v
+runAbortT = (>>> arr (either id id)) . unwrapAbortT
+
 
 instance ArrowTransformer (AbortT v) where
   lift = AbortT . (>>> arr Right)

@@ -19,6 +19,7 @@ import Util
 
 newtype StateT s a b c = StateT { runStateT :: a (b, s) (c, s) }
 
+
 instance ArrowTransformer (StateT s) where
     lift = StateT . (*** id)
     tmap f = StateT . f . runStateT

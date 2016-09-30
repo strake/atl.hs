@@ -19,6 +19,7 @@ import Util
 
 newtype WriterT w a b c = WriterT { runWriterT :: a b (c, w) }
 
+
 instance Monoid w => ArrowTransformer (WriterT w) where
     lift = WriterT . (&&& arr (const mempty))
     tmap f = WriterT . f . runWriterT

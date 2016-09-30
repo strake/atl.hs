@@ -15,6 +15,7 @@ import Util
 
 newtype ReaderT r a b c = ReaderT { runReaderT :: a (b, r) c }
 
+
 instance ArrowTransformer (ReaderT r) where
     lift = ReaderT . (<<< arr fst)
     tmap f = ReaderT . f . runReaderT
@@ -51,6 +52,6 @@ instance Arrow a => ArrowReader r (ReaderT r a) where
 instance (Arrow a, ArrowTransformer t, Arrow (t (ReaderT r a))) => ArrowReader r (t (ReaderT r a)) where
   ask = lift ask
   local f = tmap (withReaderT (arr f))
-  
+
 withReaderT :: Arrow a => a q r -> ReaderT r a b c -> ReaderT q a b c
 withReaderT a = ReaderT . (<<< id *** a) . runReaderT
