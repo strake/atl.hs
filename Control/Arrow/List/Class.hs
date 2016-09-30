@@ -1,9 +1,8 @@
 module Control.Arrow.List.Class where
 
-import Control.Arrow;
-import Control.Arrow.Transformer;
+import Control.Arrow
+import Control.Arrow.Transformer
 
-class Arrow r => ArrowList r where {
-  arrL :: ( a  -> [b]) -> r a b;
-  mapL :: ([b] -> [c]) -> r a b -> r a c;
-};
+class Arrow a => ArrowList a where
+    arrL :: (b  -> [c]) -> a b c
+    mapL :: ([c] -> [d]) -> a b c -> a b d

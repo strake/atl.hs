@@ -2,19 +2,18 @@
 
 module Control.Arrow.Writer.Class where
 
-import Prelude hiding ((.), id);
+import Prelude hiding ((.), id)
 
-import Control.Arrow;
-import Control.Category;
+import Control.Arrow
+import Control.Category
 
-class Arrow r => ArrowWriter w r | r -> w where {
-  tell :: r w ();
-  look :: r a (a, w);
-  censor :: (w -> w) -> r a b -> r a b;
-};
+class Arrow a => ArrowWriter w a | a -> w where
+    tell :: a w ()
+    listen :: a b (b, w)
+    censor :: (w -> w) -> a b c -> a b c
 
-looksA :: ArrowWriter w r => r w b -> r a (a, b);
-looksA x = look >>> id *** x;
+listenA :: ArrowWriter w a => a w c -> a b (b, c)
+listenA x = listen >>> id *** x
 
-looks :: ArrowWriter w r => (w -> b) -> r a (a, b);
-looks = looksA . arr;
+listens :: ArrowWriter w a => (w -> c) -> a b (b, c)
+listens = listenA . arr
