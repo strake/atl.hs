@@ -1,3 +1,9 @@
+{-# LANGUAGE
+    MultiParamTypeClasses
+  , FlexibleInstances
+  , FlexibleContexts
+  #-}
+
 module Control.Arrow.Reader (
     module Control.Arrow.Reader.Class
   , ReaderT(..)

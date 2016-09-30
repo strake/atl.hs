@@ -1,6 +1,8 @@
 {-# LANGUAGE
     KindSignatures
+  , MultiParamTypeClasses
   , ScopedTypeVariables
+  , FlexibleInstances
   #-}
 
 module Control.Arrow.Writer (

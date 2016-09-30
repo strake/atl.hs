@@ -1,3 +1,9 @@
+{-# LANGUAGE
+    MultiParamTypeClasses
+  , FlexibleInstances
+  , FlexibleContexts
+  #-}
+
 module Control.Arrow.Abort (
     module Control.Arrow.Abort.Class
     , AbortT(..)
