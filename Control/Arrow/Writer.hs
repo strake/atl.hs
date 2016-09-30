@@ -11,7 +11,7 @@ module Control.Arrow.Writer (
 import Prelude hiding ((.), id)
 
 import Control.Arrow
-import Control.Arrow.Transformer
+import Control.Arrow.Trans
 import Control.Arrow.Writer.Class
 import Control.Category
 import Data.Monoid
@@ -20,7 +20,7 @@ import Util
 newtype WriterT w a b c = WriterT { runWriterT :: a b (c, w) }
 
 
-instance Monoid w => ArrowTransformer (WriterT w) where
+instance Monoid w => ArrowTrans (WriterT w) where
     lift = WriterT . (&&& arr (const mempty))
     tmap f = WriterT . f . runWriterT
 

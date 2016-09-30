@@ -12,7 +12,7 @@ module Control.Arrow.State (
 import Prelude hiding ((.), id)
 
 import Control.Arrow
-import Control.Arrow.Transformer
+import Control.Arrow.Trans
 import Control.Arrow.State.Class
 import Control.Category
 import Util
@@ -20,7 +20,7 @@ import Util
 newtype StateT s a b c = StateT { runStateT :: a (b, s) (c, s) }
 
 
-instance ArrowTransformer (StateT s) where
+instance ArrowTrans (StateT s) where
     lift = StateT . (*** id)
     tmap f = StateT . f . runStateT
 
@@ -55,6 +55,6 @@ instance Arrow a => ArrowState s (StateT s a) where
     get = StateT $ arr $ \ (_, s) -> (s,  s)
     put = StateT $ arr $ \ (s, _) -> ((), s)
 
-instance (Arrow a, ArrowTransformer t, Arrow (t (StateT s a))) => ArrowState s (t (StateT s a)) where
+instance (Arrow a, ArrowTrans t, Arrow (t (StateT s a))) => ArrowState s (t (StateT s a)) where
     get = lift get
     put = lift put

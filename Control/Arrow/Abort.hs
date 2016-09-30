@@ -9,7 +9,7 @@ import Prelude hiding ((.), id)
 import Control.Monad
 import Control.Category
 import Control.Arrow
-import Control.Arrow.Transformer
+import Control.Arrow.Trans
 import Control.Arrow.Abort.Class
 import Util
 
@@ -23,7 +23,7 @@ runAbortT :: Arrow a => AbortT v a b v -> a b v
 runAbortT = (>>> arr (either id id)) . unwrapAbortT
 
 
-instance ArrowTransformer (AbortT v) where
+instance ArrowTrans (AbortT v) where
   lift = AbortT . (>>> arr Right)
   tmap f = AbortT . f . unwrapAbortT
 
@@ -45,5 +45,5 @@ instance (ArrowChoice a, ArrowLoop a, Typeable v) => ArrowLoop (AbortT v a) wher
 instance (ArrowChoice r) => ArrowAbort v (AbortT v r) where
   abort = AbortT (arr Left)
 
-instance (ArrowChoice a, ArrowTransformer t, Arrow (t (AbortT v a))) => ArrowAbort v (t (AbortT v a)) where
+instance (ArrowChoice a, ArrowTrans t, Arrow (t (AbortT v a))) => ArrowAbort v (t (AbortT v a)) where
   abort = lift abort

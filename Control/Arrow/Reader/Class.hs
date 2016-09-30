@@ -3,7 +3,6 @@
 module Control.Arrow.Reader.Class where
 
 import Control.Arrow
-import Control.Arrow.Transformer
 
 class Arrow a => ArrowReader r a | a -> r where
     ask :: a () r

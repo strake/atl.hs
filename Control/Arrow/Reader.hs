@@ -9,14 +9,14 @@ import Prelude hiding ((.), id)
 import Control.Monad
 import Control.Category
 import Control.Arrow
-import Control.Arrow.Transformer
+import Control.Arrow.Trans
 import Control.Arrow.Reader.Class
 import Util
 
 newtype ReaderT r a b c = ReaderT { runReaderT :: a (b, r) c }
 
 
-instance ArrowTransformer (ReaderT r) where
+instance ArrowTrans (ReaderT r) where
     lift = ReaderT . (<<< arr fst)
     tmap f = ReaderT . f . runReaderT
 
@@ -49,7 +49,7 @@ instance Arrow a => ArrowReader r (ReaderT r a) where
   ask = ReaderT (arr snd)
   local = withReaderT . arr
 
-instance (Arrow a, ArrowTransformer t, Arrow (t (ReaderT r a))) => ArrowReader r (t (ReaderT r a)) where
+instance (Arrow a, ArrowTrans t, Arrow (t (ReaderT r a))) => ArrowReader r (t (ReaderT r a)) where
   ask = lift ask
   local f = tmap (withReaderT (arr f))
 

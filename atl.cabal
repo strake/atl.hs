@@ -13,7 +13,7 @@ Cabal-Version: >= 1.6
 Library
     Build-Depends: base >= 4 && < 5
     Extensions: UnicodeSyntax, ScopedTypeVariables, RankNTypes, MultiParamTypeClasses, FlexibleInstances, FlexibleContexts
-    Exposed-Modules: Control.Arrow.Transformer, Control.Arrow.Reader, Control.Arrow.Reader.Class, Control.Arrow.List.Class, Control.Arrow.Abort, Control.Arrow.Abort.Class, Control.Arrow.State, Control.Arrow.State.Class, Control.Arrow.Writer, Control.Arrow.Writer.Class
+    Exposed-Modules: Control.Arrow.Trans, Control.Arrow.Reader, Control.Arrow.Reader.Class, Control.Arrow.List.Class, Control.Arrow.Abort, Control.Arrow.Abort.Class, Control.Arrow.State, Control.Arrow.State.Class, Control.Arrow.Writer, Control.Arrow.Writer.Class
     Other-Modules: Util
 
 Source-Repository head
