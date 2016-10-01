@@ -19,6 +19,22 @@ import Util
 
 newtype StateT s a b c = StateT { runStateT :: a (b, s) (c, s) }
 
+evalStateT :: Arrow a => StateT s a b c -> a (b, s) c
+evalStateT a = runStateT a >>^ fst
+
+execStateT :: Arrow a => StateT s a b c -> a (b, s) s
+execStateT a = runStateT a >>^ snd
+
+type State s = StateT s (->)
+
+runState :: State s a b -> a -> s -> (b, s)
+runState = curry . runStateT
+
+evalState :: State s a b -> a -> s -> b
+evalState = curry . evalStateT
+
+execState :: State s a b -> a -> s -> s
+execState = curry . execStateT
 
 instance ArrowTrans (StateT s) where
     lift = StateT . (*** id)

@@ -22,6 +22,22 @@ import Util
 
 newtype WriterT w a b c = WriterT { runWriterT :: a b (c, w) }
 
+evalWriterT :: Arrow a => WriterT w a b c -> a b c
+evalWriterT a = runWriterT a >>^ fst
+
+execWriterT :: Arrow a => WriterT w a b c -> a b w
+execWriterT a = runWriterT a >>^ snd
+
+type Writer w = WriterT w (->)
+
+runWriter :: Writer w a b -> a -> (b, w)
+runWriter = runWriterT
+
+evalWriter :: Writer w a b -> a -> b
+evalWriter = evalWriterT
+
+execWriter :: Writer w a b -> a -> w
+execWriter = execWriterT
 
 instance Monoid w => ArrowTrans (WriterT w) where
     lift = WriterT . (&&& arr (const mempty))

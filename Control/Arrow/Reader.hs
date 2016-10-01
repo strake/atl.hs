@@ -21,6 +21,10 @@ import Util
 
 newtype ReaderT r a b c = ReaderT { runReaderT :: a (b, r) c }
 
+type Reader r = ReaderT r (->)
+
+runReader :: Reader r a b -> a -> r -> b
+runReader = curry . runReaderT
 
 instance ArrowTrans (ReaderT r) where
     lift = ReaderT . (<<< arr fst)
