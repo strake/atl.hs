@@ -12,8 +12,10 @@ class Arrow a => ArrowState s a | a -> s where
     get :: a () s
     put :: a s ()
 
-gets :: ArrowState s a => (s -> b) -> a () b
-gets f = get >>> arr f
+gets :: ArrowState s a => a (s -> b) b
+gets = proc f -> do
+    s <- get -< ()
+    returnA -< f s
 
 set :: ArrowState s a => (s -> s) -> a b b
 set f = arr id &&& (arr (const ()) >>> get >>> arr f >>> put) >>> arr fst
