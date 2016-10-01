@@ -1,4 +1,8 @@
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE
+    Arrows
+  , MultiParamTypeClasses
+  , FunctionalDependencies
+  #-}
 
 module Control.Arrow.State.Class where
 
