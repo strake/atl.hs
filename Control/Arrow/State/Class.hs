@@ -17,5 +17,10 @@ gets = proc f -> do
     s <- get -< ()
     returnA -< f s
 
+modify :: ArrowState s a => a (s -> s) ()
+modify = proc f -> do
+    s <- get -< ()
+    put -< f s
+
 set :: ArrowState s a => (s -> s) -> a b b
 set f = arr id &&& (arr (const ()) >>> get >>> arr f >>> put) >>> arr fst
