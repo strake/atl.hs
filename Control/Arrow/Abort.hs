@@ -19,10 +19,6 @@ import Control.Arrow.Trans
 import Control.Arrow.Abort.Class
 import Util
 
-import Data.Typeable
-import Data.Dynamic
-import Control.Exception
-
 newtype AbortT v a b c = AbortT { unwrapAbortT :: a b (Either v c) }
 
 runAbortT :: Arrow a => AbortT v a b v -> a b v
@@ -45,10 +41,11 @@ instance ArrowChoice a => Arrow (AbortT v a) where
 instance (ArrowChoice a, ArrowApply a) => ArrowApply (AbortT v a) where
   app = AbortT (arr unwrapAbortT *** id >>> app)
 
-instance (ArrowChoice a, ArrowLoop a, Typeable v) => ArrowLoop (AbortT v a) where
-  loop (AbortT a) = AbortT (loop (a >>> (id +++ arr fst) &&& (arr (throw . toDyn) ||| arr snd)))
+instance (ArrowChoice a, ArrowLoop a) => ArrowLoop (AbortT v a) where
+    loop (AbortT f) = AbortT (loop (f >>> arr go))
+        where go x = (fmap fst x, snd (fromRight x))
 
-instance (ArrowChoice r) => ArrowAbort v (AbortT v r) where
+instance ArrowChoice r => ArrowAbort v (AbortT v r) where
   abort = AbortT (arr Left)
 
 instance (ArrowChoice a, ArrowTrans t, Arrow (t (AbortT v a))) => ArrowAbort v (t (AbortT v a)) where
