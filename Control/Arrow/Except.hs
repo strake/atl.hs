@@ -8,8 +8,10 @@
 module Control.Arrow.Except (
     module Control.Arrow.Except.Class
   , ExceptT(..)
+  , fromExceptT
   , Except
   , runExcept
+  , fromExcept
 ) where
 
 import Prelude hiding ((.), id)
@@ -21,12 +23,22 @@ import Control.Arrow.Trans
 import Control.Arrow.Except.Class
 import Util
 
+fromEither :: b -> Either a b -> b
+fromEither x (Left  _) = x
+fromEitehr _ (Right x) = x
+
 newtype ExceptT e a b c = ExceptT { runExceptT :: a b (Either e c) }
+
+fromExceptT :: Arrow a => ExceptT e a b c -> c -> a b c
+fromExceptT a d = runExceptT a >>^ fromEither d
 
 type Except e = ExceptT e (->)
 
 runExcept :: Except e a b -> a -> Either e b
 runExcept = runExceptT
+
+fromExcept :: Except e a b -> b -> a -> b
+fromExcept = fromExceptT
 
 instance ArrowTrans (ExceptT e) where
   lift = ExceptT . (>>> arr Right)
@@ -41,16 +53,33 @@ instance ArrowChoice a => Arrow (ExceptT e a) where
   first  = ExceptT . (>>> arr (uncurry (liftM2 (,)))) . (*** arr Right) . runExceptT
   second = ExceptT . (>>> arr (uncurry (liftM2 (,)))) . (arr Right ***) . runExceptT
 
+instance (ArrowChoice a, ArrowZero a) => ArrowZero (ExceptT e a) where
+    zeroArrow = lift zeroArrow
+
+instance (ArrowChoice a, ArrowPlus a) => ArrowPlus (ExceptT e a) where
+    ExceptT a <+> ExceptT b = ExceptT (a <+> b)
+
+instance ArrowChoice a => ArrowChoice (ExceptT e a) where
+    left (ExceptT a) = ExceptT $ proc ex -> do
+        case ex of
+            Right x -> returnA -< Right (Right x)
+            Left  x -> do
+                ey <- a -< x
+                case ey of
+                    Left err -> returnA -< Left err
+                    Right y  -> returnA -< Right (Left y)
+
+
 instance (ArrowChoice a, ArrowApply a) => ArrowApply (ExceptT e a) where
-  app = ExceptT (arr runExceptT *** id >>> app)
+    app = ExceptT (arr runExceptT *** id >>> app)
 
 instance (ArrowChoice a, ArrowLoop a) => ArrowLoop (ExceptT e a) where
     loop (ExceptT f) = ExceptT (loop (f >>> arr go))
         where go x = (fmap fst x, snd (fromRight x))
 
 instance ArrowChoice a => ArrowError e (ExceptT e a) where
-  throwError = ExceptT (arr Left)
-  catchError (ExceptT a) handler = ExceptT $ proc x -> do
+    throwError = ExceptT (arr Left)
+    catchError (ExceptT a) handler = ExceptT $ proc x -> do
       y <- a -< x
       case y of
           Right res -> returnA -< Right res
