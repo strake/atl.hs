@@ -58,7 +58,3 @@ instance ArrowState r a => ArrowReader r a where
         y <- a -< x
         put -< s
         returnA -< y
-
-instance (ArrowWriter s a, ArrowReader s a) => ArrowState s a where
-    get = ask
-    put = tell

@@ -28,8 +28,8 @@ library
                    , Control.Arrow.Except, Control.Arrow.Except.Class
                    , Control.Arrow.Writer, Control.Arrow.Writer.Class
                    , Control.Arrow.Reader, Control.Arrow.Reader.Class
+                   , Control.Arrow.List,   Control.Arrow.List.Class
                    , Control.Arrow.Trans
-                   , Control.Arrow.List.Class
                    , Util
 
   extensions:        Arrows

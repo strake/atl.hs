@@ -53,15 +53,15 @@ instance ArrowChoice a => ArrowChoice (ReaderT r a) where
               f (Right y, r) = Right y
 
 instance ArrowLoop a => ArrowLoop (ReaderT r a) where
-  loop = ReaderT . loop . (<<< swap_snds_A) . runReaderT
+    loop = ReaderT . loop . (<<< swap_snds_A) . runReaderT
 
 instance Arrow a => ArrowReader r (ReaderT r a) where
-  ask = ReaderT (arr snd)
-  local = withReaderT . arr
+    ask = ReaderT (arr snd)
+    local = withReaderT . arr
 
 instance (Arrow a, ArrowTrans t, Arrow (t (ReaderT r a))) => ArrowReader r (t (ReaderT r a)) where
-  ask = lift ask
-  local f = tmap (withReaderT (arr f))
+    ask = lift ask
+    local f = tmap (withReaderT (arr f))
 
 withReaderT :: Arrow a => a q r -> ReaderT r a b c -> ReaderT q a b c
 withReaderT a = ReaderT . (<<< id *** a) . runReaderT
