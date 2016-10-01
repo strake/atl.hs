@@ -1,5 +1,6 @@
 {-# LANGUAGE
-    KindSignatures
+    Arrows
+  , KindSignatures
   , MultiParamTypeClasses
   , ScopedTypeVariables
   , FlexibleInstances
@@ -49,12 +50,15 @@ instance (Monoid w, ArrowChoice a) => ArrowChoice (WriterT w a) where
                f (Right y)     = (Right y, mempty)
 
 instance (Monoid w, ArrowLoop a) => ArrowLoop (WriterT w a) where
-  loop = WriterT . loop . (>>> swap_snds_A) . runWriterT
+    loop = WriterT . loop . (>>> swap_snds_A) . runWriterT
 
 instance (Monoid w, Arrow a) => ArrowWriter w (WriterT w a) where
-  tell = WriterT $ constA () &&& id
-  listen = lift (runWriterT id)
-  censor = withWriterT
+    tell = WriterT $ constA () &&& id
+    listen = lift . runWriterT
+    pass a = WriterT $ proc x -> do
+        ((y, f), w) <- runWriterT a -< x
+        returnA -< (y, f w)
+
 
 withWriterTA :: Arrow a => a w w' -> WriterT w a b c -> WriterT w' a b c
 withWriterTA a = WriterT . (>>> id *** a) . runWriterT
