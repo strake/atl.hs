@@ -7,6 +7,9 @@
 module Control.Arrow.State (
     module Control.Arrow.State.Class
   , StateT(..)
+  , evalStateT, execStateT
+  , State
+  , runState, evalState, execState
 ) where
 
 import Prelude hiding ((.), id)
