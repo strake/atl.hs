@@ -13,6 +13,9 @@ atl features 5 arrow transformers which you might recognize from mtl:
 - ReaderT
 - WriterT
 - StateT
+- RWST
+
+... and their pure equivalents (arrows transformers on `(->)`).
 
 ## Installing
 
