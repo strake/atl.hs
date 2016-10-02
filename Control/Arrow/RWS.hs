@@ -24,7 +24,36 @@ import Control.Arrow.RWS.Class
 
 import Data.Monoid
 
+fst3 :: (a, b, c) -> a
+fst3 (x, _, _) = x
+
+snd3 :: (a, b, c) -> b
+snd3 (_, x, _) = x
+
+trd3 :: (a, b, c) -> c
+trd3 (_, _, x) = x
+
+curry3 :: ((a, b, c) -> d) -> a -> b -> c -> d
+curry3 f x y z = f (x, y, z)
+
 newtype RWST r w s a b c = RWST { runRWST :: a (b, r, s) (c, w, s) }
+
+evalRWST :: Arrow a => RWST r w s a b c -> a (b, r, s) (c, w)
+evalRWST a = runRWST a >>^ fst3 &&& snd3
+
+execRWST :: Arrow a => RWST r w s a b c -> a (b, r, s) (s, w)
+execRWST a = runRWST a >>^ trd3 &&& snd3
+
+type RWS r w s = RWST r w s (->)
+
+runRWS :: RWS r w s a b -> a -> r -> s -> (b, w, s)
+runRWS = curry3 . runRWST
+
+evalRWS :: RWS r w s a b -> a -> r -> s -> (b, w)
+evalRWS = curry3 . evalRWST
+
+execRWS :: RWS r w s a b -> a -> r -> s -> (s, w)
+execRWS = curry3 . execRWST
 
 instance Monoid w => ArrowTrans (RWST r w s) where
     lift a = RWST $ proc (x, _, s) -> do
