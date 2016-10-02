@@ -2,6 +2,7 @@
     Arrows
   , MultiParamTypeClasses
   , FunctionalDependencies
+  , FlexibleInstances
   , UndecidableInstances
   #-}
 
