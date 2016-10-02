@@ -1,66 +1,67 @@
-module Control.Arrow.Reader (module Control.Arrow.Reader.Class, ReaderT (..), withReaderT) where
+{-# LANGUAGE
+    MultiParamTypeClasses
+  , FlexibleInstances
+  , FlexibleContexts
+  #-}
 
-import Prelude hiding ((.), id);
+module Control.Arrow.Reader (
+    module Control.Arrow.Reader.Class
+  , ReaderT(..)
+  , withReaderT
+) where
 
-import Control.Monad;
-import Control.Category;
-import Control.Arrow;
-import Control.Arrow.Transformer;
-import Control.Arrow.Reader.Class;
-import Util;
+import Prelude hiding ((.), id)
 
-newtype ReaderT r s a b = ReaderT { runReaderT :: s (a, r) b };
+import Control.Monad
+import Control.Category
+import Control.Arrow
+import Control.Arrow.Trans
+import Control.Arrow.Reader.Class
+import Util
 
-instance ArrowTransformer (ReaderT r) where {
-  lift = ReaderT . (<<< arr fst);
-  tmap f = ReaderT . f . runReaderT;
-};
+newtype ReaderT r a b c = ReaderT { runReaderT :: a (b, r) c }
 
-instance (Arrow s) => Category (ReaderT r s) where {
-  id = ReaderT (arr fst);
-  ReaderT f . ReaderT g = ReaderT (f <<< g *** id <<< id &&& arr snd);
-};
+type Reader r = ReaderT r (->)
 
-instance (Arrow s) => Arrow (ReaderT r s) where {
-  arr = lift . arr;
-  first  = ReaderT . (<<< swap_snds_A) . (*** id) . runReaderT;
-};
+runReader :: Reader r a b -> a -> r -> b
+runReader = curry . runReaderT
 
-instance (ArrowApply s) => ArrowApply (ReaderT r s) where {
-  app = ReaderT (arr (\ ((ReaderT f, x), r) -> (f, (x, r))) >>> app);
-};
+instance ArrowTrans (ReaderT r) where
+    lift = ReaderT . (<<< arr fst)
+    tmap f = ReaderT . f . runReaderT
 
-instance (ArrowZero s) => ArrowZero (ReaderT r s) where {
-  zeroArrow = ReaderT zeroArrow;
-};
+instance Arrow a => Category (ReaderT r a) where
+    id = ReaderT (arr fst)
+    ReaderT f . ReaderT g = ReaderT (f <<< g *** id <<< id &&& arr snd)
 
-instance (ArrowPlus s) => ArrowPlus (ReaderT r s) where {
-  ReaderT f <+> ReaderT g = ReaderT (f <+> g);
-};
+instance Arrow a => Arrow (ReaderT r a) where
+    arr = lift . arr
+    first = ReaderT . (<<< swap_snds_A) . (*** id) . runReaderT
 
-instance (ArrowChoice s) => ArrowChoice (ReaderT r s) where {
-  left (ReaderT x) = ReaderT $ let {
-                       f :: (Either a b, r) -> Either (a, r) b;
-                       f (Left  x, r) = Left (x, r);
-                       f (Right y, r) = Right y;
-                     } in arr f >>> left x;
-};
+instance ArrowApply a => ArrowApply (ReaderT r a) where
+    app = ReaderT (arr (\ ((ReaderT f, x), r) -> (f, (x, r))) >>> app)
 
-instance (ArrowLoop s) => ArrowLoop (ReaderT r s) where {
-  loop = ReaderT . loop . (<<< swap_snds_A) . runReaderT;
-};
+instance ArrowZero a => ArrowZero (ReaderT r a) where
+    zeroArrow = ReaderT zeroArrow
 
-instance (Arrow s) => ArrowReader r (ReaderT r s) where {
-  ask   = ReaderT (arr snd);
-  local = withReaderT . arr;
-};
+instance ArrowPlus a => ArrowPlus (ReaderT r a) where
+    ReaderT f <+> ReaderT g = ReaderT (f <+> g)
 
-instance (Arrow s, ArrowTransformer xT, Arrow (xT (ReaderT r s))) => ArrowReader r (xT (ReaderT r s)) where {
-  ask   = lift ask;
-  local (f :: r -> r) =
-    let local' (a :: s r r) = tmap (withReaderT a :: ∀ a b. ReaderT r s a b →  ReaderT r s a b);
-    in local' (arr f);
-};
+instance ArrowChoice a => ArrowChoice (ReaderT r a) where
+    left (ReaderT x) = ReaderT (arr f >>> left x)
+        where f (Left  x, r) = Left (x, r)
+              f (Right y, r) = Right y
 
-withReaderT :: Arrow s => s q r -> ReaderT r s a b -> ReaderT q s a b;
-withReaderT a = ReaderT . (<<< id *** a) . runReaderT;
+instance ArrowLoop a => ArrowLoop (ReaderT r a) where
+    loop = ReaderT . loop . (<<< swap_snds_A) . runReaderT
+
+instance Arrow a => ArrowReader r (ReaderT r a) where
+    ask = ReaderT (arr snd)
+    local = withReaderT . arr
+
+instance (Arrow a, ArrowTrans t, Arrow (t (ReaderT r a))) => ArrowReader r (t (ReaderT r a)) where
+    ask = lift ask
+    local f = tmap (withReaderT (arr f))
+
+withReaderT :: Arrow a => a q r -> ReaderT r a b c -> ReaderT q a b c
+withReaderT a = ReaderT . (<<< id *** a) . runReaderT

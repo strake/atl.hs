@@ -1,17 +1,24 @@
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE
+    Arrows
+  , FunctionalDependencies
+  #-}
 
 module Control.Arrow.Reader.Class where
 
-import Control.Arrow;
-import Control.Arrow.Transformer;
+import Control.Arrow
 
-class Arrow s => ArrowReader r s | s -> r where {
-  ask :: s () r;
-  local :: (r -> r) -> s a b -> s a b;
-};
+class Arrow a => ArrowReader r a | a -> r where
+    reader :: (b -> r -> c) -> a b c
+    reader f = proc x -> do
+        r <- ask -< ()
+        returnA -< f x r
 
-asks :: (ArrowReader r s) => (r -> a) -> s () a;
-asks = asksA . arr;
+    ask :: a () r
+    ask = reader (\ _ r -> r)
 
-asksA :: (ArrowReader r s) => s r a -> s () a;
-asksA x = ask >>> x;
+    local :: (r -> r) -> a b c -> a b c
+
+asks :: ArrowReader r a => a (r -> b) b
+asks = proc f -> do
+    r <- ask -< ()
+    returnA -< f r

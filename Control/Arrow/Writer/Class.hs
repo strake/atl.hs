@@ -1,20 +1,40 @@
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE
+    Arrows
+  , FunctionalDependencies
+  #-}
 
 module Control.Arrow.Writer.Class where
 
-import Prelude hiding ((.), id);
+import Prelude hiding ((.), id)
 
-import Control.Arrow;
-import Control.Category;
+import Control.Arrow
+import Control.Category
 
-class Arrow r => ArrowWriter w r | r -> w where {
-  tell :: r w ();
-  look :: r a (a, w);
-  censor :: (w -> w) -> r a b -> r a b;
-};
+class Arrow a => ArrowWriter w a | a -> w where
+    writer :: (b -> (c, w)) -> a b c
+    writer f = proc x -> do
+        (y, w) <- returnA -< f x
+        tell -< w
+        returnA -< y
 
-looksA :: ArrowWriter w r => r w b -> r a (a, b);
-looksA x = look >>> id *** x;
+    tell :: a w ()
+    tell = writer (\ w -> ((), w))
 
-looks :: ArrowWriter w r => (w -> b) -> r a (a, b);
-looks = looksA . arr;
+    listen :: a b c -> a b (c, w)
+
+    pass :: a b (c, w -> w) -> a b c
+
+
+censor :: ArrowWriter w a => (w -> w) -> a b c -> a b c
+censor f a = pass $ proc x -> do
+    y <- a -< x
+    returnA -< (y, f)
+
+listenA :: ArrowWriter w a => a w c -> a b (b, c)
+listenA a = proc x -> do
+    (_, w) <- listen id -< ()
+    c <- a -< w
+    returnA -< (x, c)
+
+listens :: ArrowWriter w a => (w -> c) -> a b (b, c)
+listens = listenA . arr
