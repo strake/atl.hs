@@ -43,3 +43,4 @@ library
 
   build-depends:     base ==4.6.*
                    , comonad ==5
+                   , mtl ==2.2.1

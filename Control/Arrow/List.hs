@@ -1,5 +1,6 @@
 {-# LANGUAGE
-    MultiParamTypeClasses
+    Arrows
+  , MultiParamTypeClasses
   , FlexibleInstances
   , FlexibleContexts
   , UndecidableInstances
@@ -8,6 +9,7 @@
 module Control.Arrow.List (
     module Control.Arrow.List.Class
   , ListT(..)
+  , runList
 ) where
 
 import Prelude hiding ((.), id)
@@ -22,6 +24,11 @@ import Util
 import Data.Tuple
 
 newtype ListT a b c = ListT { runListT :: a b [c] }
+
+type List = ListT (->)
+
+runList :: List a b -> a -> [b]
+runList = runListT
 
 instance ArrowTrans ListT where
     lift a = ListT (a >>^ return)
@@ -45,13 +52,16 @@ instance ArrowChoice a => Arrow (ListT a) where
         returnA -< zip xs (repeat y)
 
 instance (ArrowChoice a, ArrowApply a) => ArrowApply (ListT a) where
-    app = ListT (arr runListT *** id >>> app)
+    app = ListT (first (arr runListT) >>> app)
 
-instance (ArrowChoice a, ArrowZero a) => ArrowZero (ListT a) where
-    zeroArrow = ListT zeroArrow
+instance ArrowChoice a => ArrowZero (ListT a) where
+    zeroArrow = ListT (constA [])
 
-instance (ArrowChoice a, ArrowPlus a) => ArrowPlus (ListT a) where
-    ListT f <+> ListT g = ListT (f <+> g)
+instance ArrowChoice a => ArrowPlus (ListT a) where
+    ListT f <+> ListT g = ListT $ proc x -> do
+        xs <- f -< x
+        ys <- g -< x
+        returnA -< xs ++ ys
 
 instance ArrowChoice a => ArrowChoice (ListT a) where
     left (ListT f) = ListT $ proc ex -> case ex of

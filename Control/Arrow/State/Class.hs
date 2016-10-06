@@ -12,8 +12,10 @@ import Prelude hiding ((.), id)
 
 import Control.Category
 import Control.Arrow
+import Control.Arrow.Kleisli
 import Control.Arrow.Writer.Class
 import Control.Arrow.Reader.Class
+import qualified Control.Monad.State as M
 
 class Arrow a => ArrowState s a | a -> s where
     state :: (b -> s -> (c, s)) -> a b c
@@ -59,3 +61,7 @@ instance ArrowState r a => ArrowReader r a where
         y <- a -< x
         put -< s
         returnA -< y
+
+instance Monad m => ArrowState s (Kleisli (M.StateT s m)) where
+    get = liftK M.get
+    put = arrK M.put
