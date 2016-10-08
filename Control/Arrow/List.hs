@@ -7,10 +7,13 @@
   #-}
 
 module Control.Arrow.List (
-    module Control.Arrow.List.Class
-  , ListT(..)
+  -- * The ListT arrow transformer
+    ListT(..)
+  -- * The pure List arrow
   , List
   , runList
+  -- * Re-exports
+  , module Control.Arrow.List.Class
 ) where
 
 import Prelude hiding ((.), id)
@@ -24,10 +27,13 @@ import Util
 
 import Data.Tuple
 
+-- | Embeds a multiple-output arrow.
 newtype ListT a b c = ListT { runListT :: a b [c] }
 
+-- | Pure List arrow.
 type List = ListT (->)
 
+-- | Runs a pure List arrow.
 runList :: List a b -> a -> [b]
 runList = runListT
 

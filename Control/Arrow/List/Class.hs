@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module Control.Arrow.List.Class (
+  -- * The ArrowList class
     ArrowList
   , arrL
   , mapL
@@ -9,9 +10,16 @@ module Control.Arrow.List.Class (
 import Control.Arrow
 import Control.Applicative
 
+-- | A multiple output arrow
 class Arrow a => ArrowList a where
-    arrL :: (b  -> [c]) -> a b c
-    mapL :: ([c] -> [d]) -> a b c -> a b d
+    -- | Wraps a pure function into an @ArrowList@.
+    arrL :: (b  -> [c])  -- ^ The pure function to wrap
+         -> a b c
+
+    -- | Applies a pure function to every output of a given arrow.
+    mapL :: ([c] -> [d])  -- ^ The mapping function
+         -> a b c         -- ^ The arrow to map
+         -> a b d
 
 instance ArrowList (Kleisli []) where
     arrL = Kleisli . arr

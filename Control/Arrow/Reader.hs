@@ -5,10 +5,16 @@
   #-}
 
 module Control.Arrow.Reader (
-    module Control.Arrow.Reader.Class
-  , ReaderT(..)
+  -- * The ReaderT arrow transformer
+    ReaderT(..)
   , withReaderT
+
+  -- * The pure Reader arrow
+  , Reader
   , runReader
+
+  -- * Re-exports
+  , module Control.Arrow.Reader.Class
 ) where
 
 import Prelude hiding ((.), id)
@@ -20,10 +26,13 @@ import Control.Arrow.Trans
 import Control.Arrow.Reader.Class
 import Util
 
+-- | A computation reading an immutable state.
 newtype ReaderT r a b c = ReaderT { runReaderT :: a (b, r) c }
 
+-- | Pure Reader arrow.
 type Reader r = ReaderT r (->)
 
+-- | Runs a pure Reader computation.
 runReader :: Reader r a b -> a -> r -> b
 runReader = curry . runReaderT
 
@@ -59,5 +68,6 @@ instance Arrow a => ArrowReader r (ReaderT r a) where
     ask = ReaderT (arr snd)
     local = withReaderT . arr
 
+-- | Executes a computation in a temporarily modified state.
 withReaderT :: Arrow a => a q r -> ReaderT r a b c -> ReaderT q a b c
 withReaderT a = ReaderT . (<<< id *** a) . runReaderT

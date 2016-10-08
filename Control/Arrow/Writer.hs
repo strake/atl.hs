@@ -7,16 +7,23 @@
   #-}
 
 module Control.Arrow.Writer (
-    module Control.Arrow.Writer.Class
-  , WriterT(..)
+  -- * The WriterT arrow transformer
+    WriterT(..)
   , evalWriterT
   , execWriterT
+
+  -- * The pure Writer arrow
   , Writer
   , runWriter
   , evalWriter
   , execWriter
+
+  -- * Helper functions
   , withWriterT
   , withWriterTA
+
+  -- * Re-exports
+  , module Control.Arrow.Writer.Class
 ) where
 
 import Prelude hiding ((.), id)
@@ -28,22 +35,28 @@ import Control.Category
 import Data.Monoid
 import Util
 
+-- | An arrow which outputs a result evaluated along the computation.
 newtype WriterT w a b c = WriterT { runWriterT :: a b (c, w) }
 
+-- | Returns only the result of the computation.
 evalWriterT :: Arrow a => WriterT w a b c -> a b c
 evalWriterT a = runWriterT a >>^ fst
 
+-- | Returns only the output of the computation.
 execWriterT :: Arrow a => WriterT w a b c -> a b w
 execWriterT a = runWriterT a >>^ snd
 
 type Writer w = WriterT w (->)
 
+-- | Returns the result and the output of the computation.
 runWriter :: Writer w a b -> a -> (b, w)
 runWriter = runWriterT
 
+-- | Returns only the result of the computation.
 evalWriter :: Writer w a b -> a -> b
 evalWriter = evalWriterT
 
+-- | Returns only the output of the computation.
 execWriter :: Writer w a b -> a -> w
 execWriter = execWriterT
 
@@ -82,9 +95,10 @@ instance (Monoid w, Arrow a) => ArrowWriter w (WriterT w a) where
         ((y, f), w) <- runWriterT a -< x
         returnA -< (y, f w)
 
-
+-- | Executes a computation in a temporarily modified state.
 withWriterTA :: Arrow a => a w w' -> WriterT w a b c -> WriterT w' a b c
 withWriterTA a = WriterT . (>>> id *** a) . runWriterT
 
+-- | Executes a computation in a temporarily modified state.
 withWriterT :: Arrow a => (w -> w') -> WriterT w a b c -> WriterT w' a b c
 withWriterT = withWriterTA . arr

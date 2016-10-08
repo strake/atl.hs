@@ -6,12 +6,17 @@
   #-}
 
 module Control.Arrow.Except (
-    module Control.Arrow.Except.Class
-  , ExceptT(..)
+  -- * The ExceptT arrow transformer
+    ExceptT(..)
   , fromExceptT
+
+  -- * The pure Except arrow
   , Except
   , runExcept
   , fromExcept
+
+  -- * Re-exports
+  , module Control.Arrow.Except.Class
 ) where
 
 import Prelude hiding ((.), id)
@@ -25,18 +30,23 @@ import Util
 
 fromEither :: b -> Either a b -> b
 fromEither x (Left  _) = x
-fromEitehr _ (Right x) = x
+fromEither _ (Right x) = x
 
+-- | A failable computation.
 newtype ExceptT e a b c = ExceptT { runExceptT :: a b (Either e c) }
 
+-- | Runs a computation and gives a default value in case of failure.
 fromExceptT :: Arrow a => ExceptT e a b c -> c -> a b c
 fromExceptT a d = runExceptT a >>^ fromEither d
 
+-- | Pure ExceptT
 type Except e = ExceptT e (->)
 
+-- | Runs an Except arrow.
 runExcept :: Except e a b -> a -> Either e b
 runExcept = runExceptT
 
+-- | Runs a computation and gives a default value in case of failure.
 fromExcept :: Except e a b -> b -> a -> b
 fromExcept = fromExceptT
 

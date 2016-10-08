@@ -8,10 +8,13 @@
   #-}
 
 module Control.Arrow.Cokleisli (
-    module Control.Arrow
-  , module Control.Comonad
-  , ArrowCokleisli
+  -- * The ArrowCokleisli class
+    ArrowCokleisli
   , arrCK, liftCK
+
+  -- * Re-exports
+  , module Control.Arrow
+  , module Control.Comonad
 ) where
 
 import Prelude hiding ((.), id)
@@ -24,9 +27,12 @@ import Util
 
 import Data.Monoid
 
+-- | An arrow embedding a comonadic action.
 class (Comonad w, Arrow k) => ArrowCokleisli w k | k -> w where
+    -- | Wraps a comonadic action into the arrow.
     arrCK :: (w a -> b) -> k a b
 
+-- | Wraps a pure value into an arrow.
 liftCK :: ArrowCokleisli w k => b -> k a b
 liftCK = arrCK . const
 

@@ -6,14 +6,19 @@
   #-}
 
 module Control.Arrow.RWS (
-    module Control.Arrow.RWS.Class
-  , RWST(..)
+  -- * The RWST arrow transformer
+    RWST(..)
   , evalRWST
   , execRWST
+
+  -- * The pure RWS arrow
   , RWS
   , runRWS
   , evalRWS
   , execRWS
+
+  -- * Re-exports
+  , module Control.Arrow.RWS.Class
 ) where
 
 import Prelude hiding ((.), id)
@@ -42,22 +47,29 @@ trd3 (_, _, x) = x
 curry3 :: ((a, b, c) -> d) -> a -> b -> c -> d
 curry3 f x y z = f (x, y, z)
 
+-- | A configuration-output-state computation
 newtype RWST r w s a b c = RWST { runRWST :: a (b, r, s) (c, w, s) }
 
+-- | Returns the state and the result and the output of a computation.
 evalRWST :: Arrow a => RWST r w s a b c -> a (b, r, s) (c, w)
 evalRWST a = runRWST a >>^ fst3 &&& snd3
 
+-- | Returns the state and the output of a computation.
 execRWST :: Arrow a => RWST r w s a b c -> a (b, r, s) (s, w)
 execRWST a = runRWST a >>^ trd3 &&& snd3
 
+-- | The pure RWS arrow.
 type RWS r w s = RWST r w s (->)
 
+-- | Returns the result, the output and the final state of the computation.
 runRWS :: RWS r w s a b -> a -> r -> s -> (b, w, s)
 runRWS = curry3 . runRWST
 
+-- | Returns the state and the result and the output of a computation.
 evalRWS :: RWS r w s a b -> a -> r -> s -> (b, w)
 evalRWS = curry3 . evalRWST
 
+-- | Returns the state and the output of a computation.
 execRWS :: RWS r w s a b -> a -> r -> s -> (s, w)
 execRWS = curry3 . execRWST
 

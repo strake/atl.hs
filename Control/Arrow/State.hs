@@ -5,14 +5,19 @@
   #-}
 
 module Control.Arrow.State (
-    module Control.Arrow.State.Class
-  , StateT(..)
+  -- * The StateT arrow transformer
+    StateT(..)
   , evalStateT
   , execStateT
+
+  -- * The pure State arrow
   , State
   , runState
   , evalState
   , execState
+
+  -- * Re-exports
+  , module Control.Arrow.State.Class
 ) where
 
 import Prelude hiding ((.), id)
@@ -23,22 +28,29 @@ import Control.Arrow.State.Class
 import Control.Category
 import Util
 
+-- | An arrow embedding stateful computations.
 newtype StateT s a b c = StateT { runStateT :: a (b, s) (c, s) }
 
+-- | Returns only the output of the computation.
 evalStateT :: Arrow a => StateT s a b c -> a (b, s) c
 evalStateT a = runStateT a >>^ fst
 
+-- | Returns only the final state of the computation.
 execStateT :: Arrow a => StateT s a b c -> a (b, s) s
 execStateT a = runStateT a >>^ snd
 
+-- | The pure State arrow.
 type State s = StateT s (->)
 
+-- | Returns the output and the final state of the computation.
 runState :: State s a b -> a -> s -> (b, s)
 runState = curry . runStateT
 
+-- | Returns only the output of the computation.
 evalState :: State s a b -> a -> s -> b
 evalState = curry . evalStateT
 
+-- | Returns only the final state of the computation.
 execState :: State s a b -> a -> s -> s
 execState = curry . execStateT
 

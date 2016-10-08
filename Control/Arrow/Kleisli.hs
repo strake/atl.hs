@@ -8,9 +8,12 @@
   #-}
 
 module Control.Arrow.Kleisli (
-    module Control.Arrow
-  , ArrowKleisli
+  -- * The ArrowKleisli class
+    ArrowKleisli
   , arrK, liftK
+
+  -- * Re-exports
+  , module Control.Arrow
 ) where
 
 import Prelude hiding ((.), id)
@@ -22,9 +25,12 @@ import Util
 
 import Data.Monoid
 
+-- | An arrow embedding a monadic action.
 class (Monad m, Arrow k) => ArrowKleisli m k | k -> m where
+    -- | Wraps a monadic action into the arrow.
     arrK :: (a -> m b) -> k a b
 
+-- | Lifts a monadic value into an arrow.
 liftK :: ArrowKleisli m k => m b -> k a b
 liftK = arrK . const
 
