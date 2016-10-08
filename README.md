@@ -6,14 +6,15 @@ mtl library.
 
 ## Features
 
-atl features 5 arrow transformers which you might recognize from mtl:
+atl features 7 arrow transformers which you might recognize from mtl:
 
+- ContT
 - ExceptT
 - ListT
 - ReaderT
-- WriterT
-- StateT
 - RWST
+- StateT
+- WriterT
 
 ... and their pure equivalents (arrows transformers on `(->)`).
 
