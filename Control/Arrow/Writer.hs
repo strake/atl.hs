@@ -9,6 +9,14 @@
 module Control.Arrow.Writer (
     module Control.Arrow.Writer.Class
   , WriterT(..)
+  , evalWriterT
+  , execWriterT
+  , Writer
+  , runWriter
+  , evalWriter
+  , execWriter
+  , withWriterT
+  , withWriterTA
 ) where
 
 import Prelude hiding ((.), id)
@@ -41,7 +49,6 @@ execWriter = execWriterT
 
 instance Monoid w => ArrowTrans (WriterT w) where
     lift = WriterT . (&&& arr (const mempty))
-    tmap f = WriterT . f . runWriterT
 
 instance (Monoid w, Arrow a) => Category (WriterT w a) where
     id = lift id

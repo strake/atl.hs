@@ -7,9 +7,12 @@
 module Control.Arrow.State (
     module Control.Arrow.State.Class
   , StateT(..)
-  , evalStateT, execStateT
+  , evalStateT
+  , execStateT
   , State
-  , runState, evalState, execState
+  , runState
+  , evalState
+  , execState
 ) where
 
 import Prelude hiding ((.), id)
@@ -41,7 +44,6 @@ execState = curry . execStateT
 
 instance ArrowTrans (StateT s) where
     lift = StateT . (*** id)
-    tmap f = StateT . f . runStateT
 
 instance Category a => Category (StateT s a) where
     id = StateT id

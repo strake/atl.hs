@@ -8,6 +8,12 @@
 module Control.Arrow.RWS (
     module Control.Arrow.RWS.Class
   , RWST(..)
+  , evalRWST
+  , execRWST
+  , RWS
+  , runRWS
+  , evalRWS
+  , execRWS
 ) where
 
 import Prelude hiding ((.), id)
@@ -59,8 +65,6 @@ instance Monoid w => ArrowTrans (RWST r w s) where
     lift a = RWST $ proc (x, _, s) -> do
         y <- a -< x
         returnA -< (y, mempty, s)
-
-    tmap f = RWST . f . runRWST
 
 instance (Monoid w, Arrow a) => Category (RWST r w s a) where
     id = RWST $ arr (\ (x, _, s) -> (x, mempty, s))

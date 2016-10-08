@@ -1,4 +1,10 @@
-module Control.Arrow.List.Class where
+{-# LANGUAGE FlexibleInstances #-}
+
+module Control.Arrow.List.Class (
+    ArrowList
+  , arrL
+  , mapL
+) where
 
 import Control.Arrow
 import Control.Applicative

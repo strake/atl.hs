@@ -42,7 +42,6 @@ fromExcept = fromExceptT
 
 instance ArrowTrans (ExceptT e) where
   lift = ExceptT . (>>> arr Right)
-  tmap f = ExceptT . f . runExceptT
 
 instance ArrowChoice a => Category (ExceptT e a) where
   id = ExceptT (arr Right)

@@ -3,7 +3,12 @@
   , FunctionalDependencies
   #-}
 
-module Control.Arrow.RWS.Class where
+module Control.Arrow.RWS.Class (
+    ArrowRWS
+  , module Control.Arrow.Reader.Class
+  , module Control.Arrow.Writer.Class
+  , module Control.Arrow.State.Class
+) where
 
 import Control.Arrow.Reader.Class
 import Control.Arrow.Writer.Class

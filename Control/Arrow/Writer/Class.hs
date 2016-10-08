@@ -3,7 +3,16 @@
   , FunctionalDependencies
   #-}
 
-module Control.Arrow.Writer.Class where
+module Control.Arrow.Writer.Class (
+    ArrowWriter
+  , writer
+  , tell
+  , listen
+  , pass
+  , censor
+  , listenA
+  , listens
+) where
 
 import Prelude hiding ((.), id)
 

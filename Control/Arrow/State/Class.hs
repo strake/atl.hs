@@ -6,7 +6,14 @@
   , UndecidableInstances
   #-}
 
-module Control.Arrow.State.Class where
+module Control.Arrow.State.Class (
+    ArrowState
+  , state
+  , get
+  , put
+  , gets
+  , modify
+) where
 
 import Prelude hiding ((.), id)
 
@@ -41,9 +48,6 @@ modify :: ArrowState s a => a (s -> s) ()
 modify = proc f -> do
     s <- get -< ()
     put -< f s
-
-set :: ArrowState s a => (s -> s) -> a b b
-set f = arr id &&& (arr (const ()) >>> get >>> arr f >>> put) >>> arr fst
 
 
 instance ArrowState w a => ArrowWriter w a where

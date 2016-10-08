@@ -9,6 +9,7 @@
 module Control.Arrow.List (
     module Control.Arrow.List.Class
   , ListT(..)
+  , List
   , runList
 ) where
 
@@ -32,7 +33,6 @@ runList = runListT
 
 instance ArrowTrans ListT where
     lift a = ListT (a >>^ return)
-    tmap f = ListT . f . runListT
 
 instance ArrowChoice a => Category (ListT a) where
     id = ListT (arr return)

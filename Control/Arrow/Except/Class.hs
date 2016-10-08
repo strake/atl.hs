@@ -1,6 +1,10 @@
 {-# LANGUAGE FunctionalDependencies #-}
 
-module Control.Arrow.Except.Class where
+module Control.Arrow.Except.Class (
+    ArrowError
+  , throwError
+  , catchError
+) where
 
 import Control.Arrow
 

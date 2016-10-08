@@ -4,7 +4,13 @@
   , FunctionalDependencies
   #-}
 
-module Control.Arrow.Reader.Class where
+module Control.Arrow.Reader.Class (
+    ArrowReader
+  , reader
+  , ask
+  , local
+  , asks
+) where
 
 import Control.Arrow
 import Control.Arrow.Kleisli
