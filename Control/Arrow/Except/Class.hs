@@ -1,4 +1,7 @@
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE
+    MultiParamTypeClasses
+  , FunctionalDependencies
+  #-}
 
 module Control.Arrow.Except.Class (
     ArrowError
