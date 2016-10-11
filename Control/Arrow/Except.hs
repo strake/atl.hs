@@ -25,6 +25,7 @@ import Control.Monad
 import Control.Category
 import Control.Arrow
 import Control.Arrow.Trans
+import Control.Arrow.Hoist
 import Control.Arrow.Except.Class
 import Util
 
@@ -51,7 +52,10 @@ fromExcept :: Except e a b -> b -> a -> b
 fromExcept = fromExceptT
 
 instance ArrowTrans (ExceptT e) where
-  lift = ExceptT . (>>> arr Right)
+    lift = ExceptT . (>>> arr Right)
+
+instance ArrowHoist (ExceptT e) where
+    hoistA f (ExceptT a) = ExceptT (f a)
 
 instance ArrowChoice a => Category (ExceptT e a) where
   id = ExceptT (arr Right)

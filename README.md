@@ -18,6 +18,10 @@ atl features 7 arrow transformers which you might recognize from mtl:
 
 ... and their pure equivalents (arrows transformers on `(->)`).
 
+atl also ports comonads from the comonad package:
+
+- StoreT
+
 ## Installing
 
 You can install atl either by cloning the repository

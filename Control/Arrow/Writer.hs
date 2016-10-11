@@ -30,10 +30,12 @@ import Prelude hiding ((.), id)
 
 import Control.Arrow
 import Control.Arrow.Trans
-import Control.Arrow.Writer.Class
+import Control.Arrow.Hoist
 import Control.Category
 import Data.Monoid
 import Util
+
+import Control.Arrow.Writer.Class
 
 -- | An arrow which outputs a result evaluated along the computation.
 newtype WriterT w a b c = WriterT { runWriterT :: a b (c, w) }
@@ -62,6 +64,9 @@ execWriter = execWriterT
 
 instance Monoid w => ArrowTrans (WriterT w) where
     lift = WriterT . (&&& arr (const mempty))
+
+instance Monoid w => ArrowHoist (WriterT w) where
+    hoistA f (WriterT a) = WriterT (f a)
 
 instance (Monoid w, Arrow a) => Category (WriterT w a) where
     id = lift id

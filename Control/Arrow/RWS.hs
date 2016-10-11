@@ -25,6 +25,7 @@ import Prelude hiding ((.), id)
 
 import Control.Arrow
 import Control.Arrow.Trans
+import Control.Arrow.Hoist
 import Control.Category
 import Util
 
@@ -77,6 +78,9 @@ instance Monoid w => ArrowTrans (RWST r w s) where
     lift a = RWST $ proc (x, _, s) -> do
         y <- a -< x
         returnA -< (y, mempty, s)
+
+instance Monoid w => ArrowHoist (RWST r w s) where
+    hoistA f (RWST a) = RWST (f a)
 
 instance (Monoid w, Arrow a) => Category (RWST r w s a) where
     id = RWST $ arr (\ (x, _, s) -> (x, mempty, s))

@@ -23,6 +23,7 @@ import Control.Monad
 import Control.Category
 import Control.Arrow
 import Control.Arrow.Trans
+import Control.Arrow.Hoist
 import Control.Arrow.Reader.Class
 import Util
 
@@ -38,6 +39,9 @@ runReader = curry . runReaderT
 
 instance ArrowTrans (ReaderT r) where
     lift = ReaderT . (<<< arr fst)
+
+instance ArrowHoist (ReaderT r) where
+    hoistA f (ReaderT a) = ReaderT (f a)
 
 instance Arrow a => Category (ReaderT r a) where
     id = ReaderT (arr fst)

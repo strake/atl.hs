@@ -34,6 +34,7 @@ library
                    , Control.Arrow.Writer,  Control.Arrow.Writer.Class
                    , Control.Arrow.Kleisli, Control.Arrow.Cokleisli
                    , Control.Arrow.Trans
+                   , Control.Arrow.Hoist
                    , Util
 
   extensions:        Arrows

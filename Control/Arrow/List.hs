@@ -22,6 +22,7 @@ import Control.Monad
 import Control.Category
 import Control.Arrow
 import Control.Arrow.Trans
+import Control.Arrow.Hoist
 import Control.Arrow.List.Class
 import Util
 
@@ -39,6 +40,9 @@ runList = runListT
 
 instance ArrowTrans ListT where
     lift a = ListT (a >>^ return)
+
+instance ArrowHoist ListT where
+    hoistA f (ListT a) = ListT (f a)
 
 instance ArrowChoice a => Category (ListT a) where
     id = ListT (arr return)

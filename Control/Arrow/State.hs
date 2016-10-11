@@ -24,6 +24,7 @@ import Prelude hiding ((.), id)
 
 import Control.Arrow
 import Control.Arrow.Trans
+import Control.Arrow.Hoist
 import Control.Arrow.State.Class
 import Control.Category
 import Util
@@ -56,6 +57,9 @@ execState = curry . execStateT
 
 instance ArrowTrans (StateT s) where
     lift = StateT . (*** id)
+
+instance ArrowHoist (StateT s) where
+    hoistA f (StateT a) = StateT (f a)
 
 instance Category a => Category (StateT s a) where
     id = StateT id

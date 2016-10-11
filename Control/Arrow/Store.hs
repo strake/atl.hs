@@ -20,6 +20,7 @@ import Prelude hiding ((.), id)
 
 import Control.Arrow
 import Control.Arrow.Trans
+import Control.Arrow.Hoist
 import Control.Arrow.Store.Class
 import Control.Category
 import Util
@@ -47,6 +48,9 @@ runStore = runStoreT
 
 instance ArrowTrans (StoreT s) where
     lift a = StoreT (uncurry ($) ^>> a)
+
+instance ArrowHoist (StoreT s) where
+    hoistA f (StoreT a) = StoreT (f a)
 
 instance Arrow a => Category (StoreT s a) where
     id = StoreT (arr $ uncurry ($))
