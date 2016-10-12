@@ -1,3 +1,5 @@
+{-# LANGUAGE Arrows #-}
+
 module Util where
 
 import Control.Arrow

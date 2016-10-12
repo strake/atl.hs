@@ -18,6 +18,9 @@ import Prelude hiding ((.), id)
 
 import Control.Category
 import Control.Arrow
+import Control.Comonad
+import qualified Control.Comonad.Store as W
+import Control.Monad.Identity
 
 import Util
 
@@ -46,3 +49,8 @@ class Arrow a => ArrowStore s a | a -> s where
     seeks a = proc (f, x) -> do
         s <- pos -< ()
         a -< (f s, x)
+
+instance ArrowStore s (Cokleisli (W.Store s)) where
+    pos = Cokleisli $ \ (W.StoreT _ s) -> s
+    peek (Cokleisli a) = Cokleisli $ \ (W.StoreT f s) ->
+        a (W.StoreT (Identity $ const ()) s)
