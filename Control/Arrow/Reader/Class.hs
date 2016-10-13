@@ -2,6 +2,7 @@
     Arrows
   , MultiParamTypeClasses
   , FunctionalDependencies
+  , FlexibleInstances
   #-}
 
 module Control.Arrow.Reader.Class (

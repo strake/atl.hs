@@ -1,7 +1,6 @@
 {-# LANGUAGE
     MultiParamTypeClasses
   , FlexibleInstances
-  , FlexibleContexts
   #-}
 
 module Control.Arrow.State (
@@ -91,7 +90,3 @@ instance ArrowLoop a => ArrowLoop (StateT s a) where
 instance Arrow a => ArrowState s (StateT s a) where
     get = StateT $ arr $ \ (_, s) -> (s,  s)
     put = StateT $ arr $ \ (s, _) -> ((), s)
-
-instance (Arrow a, ArrowTrans t, Arrow (t (StateT s a))) => ArrowState s (t (StateT s a)) where
-    get = lift get
-    put = lift put

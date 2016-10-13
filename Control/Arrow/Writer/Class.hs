@@ -1,6 +1,7 @@
 {-# LANGUAGE
     Arrows
   , FunctionalDependencies
+  , FlexibleInstances
   #-}
 
 module Control.Arrow.Writer.Class (
