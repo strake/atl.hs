@@ -1,16 +1,19 @@
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE
+    Arrows
+  , MultiParamTypeClasses
+  , FunctionalDependencies
+  #-}
 
 module Control.Arrow.State.Class where
 
-import Control.Arrow;
+import Control.Arrow
 
-class Arrow r => ArrowState s r | r -> s where {
-  get :: r ()  s;
-  put :: r s  ();
-};
+class Arrow a => ArrowState s a | a -> s where
+    get :: a () s
+    put :: a s ()
 
-gets :: ArrowState s r => (s -> a) -> r () a;
-gets f = get >>> arr f;
+gets :: ArrowState s a => (s -> b) -> a () b
+gets f = get >>> arr f
 
-set :: ArrowState s r => (s -> s) -> r a a;
-set f = arr id &&& (arr (const ()) >>> get >>> arr f >>> put) >>> arr fst;
+set :: ArrowState s a => (s -> s) -> a b b
+set f = arr id &&& (arr (const ()) >>> get >>> arr f >>> put) >>> arr fst
